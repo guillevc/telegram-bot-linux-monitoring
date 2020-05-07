@@ -1,0 +1,3 @@
+python-telegram-bot==12.7
+sh==1.13.1
+python-dotenv==0.12.0
