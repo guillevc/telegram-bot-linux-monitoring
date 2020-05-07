@@ -22,16 +22,22 @@ def main():
 
     bot.send_message(SECURITY_ALERTS_CHANNEL, system_summary(), parse_mode=telegram.ParseMode.MARKDOWN)
 
-    print(sh.last())
+    #print(sh.lastlog('-t 7'))
+    #input()
+    #print(sh.awk(sh.grep(sh.lastlog('-t 7').strip(), '-v', 'Latest'), '{$1="";$2="";$3="";print $0 }'))
+    #last_log_week = sh.lastlog('-t 7').strip()
+    #print(repr(last_log_week))
+    #print(sh.grep(sh.lastlog('-t 7'), '-v', 'Latest'))
+    #input()
 
     # listen to log files
     auth_log_path = '/var/log/auth.log'
     def on_log_auth_path_new_line(line):
         line = line.strip()
         logger.info(f'new line detected in auth.log={line}')
-    auth_log_tail = sh.tail('-f', '-n 0', auth_log_path, _out=on_log_auth_path_new_line, _bg=True)
+    #auth_log_tail = sh.tail('-f', '-n 0', auth_log_path, _out=on_log_auth_path_new_line, _bg=True)
 
-    auth_log_tail.wait()
+    #auth_log_tail.wait()
 
 def system_summary():
     SECURITY_UPDATES_COUNT_COMMAND = 'apt list --upgradable 2>/dev/null | grep "\-security" | wc -l'
