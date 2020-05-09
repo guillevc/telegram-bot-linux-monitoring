@@ -5,7 +5,7 @@ import logging
 import telegram
 from dotenv import load_dotenv
 import os
-import sh
+#import sh
 import ipaddress
 import argparse
 import sys
@@ -16,22 +16,22 @@ ERROR_AUTH_LOG_LINES_TOKENS = ['invalid user', 'connection closed']
 
 TELEGRAM_BOT_AUTHENTICATION_TOKEN = os.getenv('TELEGRAM_BOT_AUTHENTICATION_TOKEN')
 SECURITY_ALERTS_CHANNEL = os.getenv('TELEGRAM_SECURITY_ALERTS_TARGET')
-SYSTEM_MONITORING_CHANNEL = os.getenv('TELEGRAM_SYSTEM_MONITORING_TARGET')
+SYSTEM_MONITORING_CHANNEL = os.getenv('TELEGRAM_SYSTEM_REPORTS_TARGET')
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 logger = logging.getLogger(__name__)
 
 def main():
-    parser = argparse.ArgumentParser(prog='twitter_activity_api', add_help=True)
-    parser.add_argument('--send-week-summary', action='store_true', help='register a new webhook to this url')
-    parser.add_argument('--listen-auth-log', action='store_true', help='lists all webhooks')
+    parser = argparse.ArgumentParser(description='System monitoring via Telegram', add_help=True)
+    parser.add_argument('--send-report', action='store_true', help='sends week use summary to TELEGRAM_SYSTEM_REPORTS_TARGET')
+    parser.add_argument('--listen-auth-log', action='store_true', help='listens to login attempts on /var/log/auth.log and sends reports to TELEGRAM_SECURITY_ALERTS_TARGET')
     args = parser.parse_args()
 
     bot = telegram.Bot(TELEGRAM_BOT_AUTHENTICATION_TOKEN)
 
-    if args.send_week_summary:
-        bot.send_message(SYSTEM_MONITORING_CHANNEL, get_system_summary_str(), parse_mode=telegram.ParseMode.MARKDOWN)   
+    if args.send_report:
+        bot.send_message(SYSTEM_MONITORING_CHANNEL, get_system_summary_str(), parse_mode=telegram.ParseMode.MARKDOWN)
     elif args.listen_auth_log:
         # listen to log files
         auth_log_path = '/var/log/auth.log'
@@ -81,7 +81,7 @@ def get_system_summary_str():
         last_week_logins_str += 'Date: {}\n'.format(login_dict['date'])
         if i < len(last_week_logins) - 1:
             last_week_logins_str += '--\n'
-    
+
     available_space_str = ''
     for i, line in enumerate(sh.df('-h', '--total')):
         line = line.strip().split()
@@ -89,7 +89,7 @@ def get_system_summary_str():
             if line[5] == '-':
                 line[5] = 'TOTAL'
             available_space_str += '{} {}\n'.format(line[4], line[5])
-                
+
     uptime_str = sh.uptime('-p')
 
     return \
