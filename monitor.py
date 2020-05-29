@@ -5,7 +5,7 @@ import logging
 import telegram
 from dotenv import load_dotenv
 import os
-#import sh
+import sh
 import ipaddress
 import argparse
 import sys
